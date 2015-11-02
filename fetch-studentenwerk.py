@@ -16,7 +16,7 @@ def fetch(location='tu', veg=True, archive=None):
     soup = bs4.BeautifulSoup(soup.find('item').find('description').text, 'lxml')
 
     format_shit = lambda el: [
-            (f.find('strong').text, Decimal(f.find(class_='mensa_preise').text.split()[1]))
+            (f.find('strong').text + f.find(text=True, recursive=False), Decimal(f.find(class_='mensa_preise').text.split()[1]))
             for f in el.findAll(class_='mensa_speise')]
 
     ft = lambda t: [format_shit(e) for e in soup.findAll(class_=t)]
