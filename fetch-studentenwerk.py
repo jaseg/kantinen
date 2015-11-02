@@ -25,6 +25,8 @@ def fetch(location='tu', veg=True, archive=None):
 
     week = list(zip(special, food, soups))
 
+    week = [[[(m,p) for (m,p) in c if "Nudelauswahl" not in m or p != Decimal('2.45')] for c in d] for d in week]
+
     return week
 
 def print_week(week):
