@@ -25,7 +25,7 @@ def fetch(location='MA', archive=None):
     l = re.split('Montag|Dienstag|Mittwoch|Donnerstag|Freitag', c)[3:]
 
     res = (('^\W*[,.]?\W*([0-9. ]{4,9})?\W*', ''),
-           ('“\W*([^“]*\w)\W*“', '“\\1“'),
+           ('“\W*([^“]*\w)\W*“', '„\\1“'),
            ('\\(\W*', '('),
            ('\W*\\)', ')'),
            (' ([a-zäöüß]) ', '\\1'),
