@@ -22,7 +22,11 @@ def fetch(location='MA', archive=None):
             subprocess.check_output(['pdfcrop', '--margins', '-80 -160 -60 -140', orig.name, out.name])
             c = subprocess.check_output(['venv2/bin/pdf2txt.py', '-p', '1', out.name]).decode('UTF-8')
 
-    l = re.split('Montag|Dienstag|Mittwoch|Donnerstag|Freitag', c)[3:]
+    l = [ s for s in re.split('Montag|Dienstag|Mittwoch|Donnerstag|Freitag', c)
+            if 'Kantinenbetriebe' not in s
+            and 'Erdgeschoss' not in s
+            and 'PERSONALKANTINE' not in s
+            and len(s) > 5 ]
 
     res = (('^\W*[,.]?\W*([0-9. ]{4,9})?\W*', ''),
            ('“\W*([^“]*\w)\W*“', '„\\1“'),
@@ -42,17 +46,19 @@ def fetch(location='MA', archive=None):
     f = [[(' '.join(title), Decimal(price.replace(',', '.'))) for *title, price in [el.split() for el in k]] for k in e]
     return f
 
-def print_week(week):
-    for i,day in enumerate(week):
-        print(('Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag')[i])
-        print('--------');
-        for meal, price in day:
-            print('{:<80} {:02f}'.format(meal, price))
-        print()
+def format_day(day):
+    return '\n'.join('{:<80} {:02f}'.format(meal, price) for meal, price in day)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('location', default='MA', nargs='?')
-parser.add_argument('-a', '--archive', help='Keep archival copy of source document under given path')
-args = parser.parse_args()
+underline = lambda s, char='-': s + '\n' + (char*len(s))
+WEEKDAYS = ('Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag')
 
-print_week(fetch(args.location, args.archive))
+def format_week(week):
+    return '\n\n'.join( underline(weekday) + '\n' + format_day(day) for weekday,day in zip(WEEKDAYS, week) )
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('location', default='MA', nargs='?')
+    parser.add_argument('-a', '--archive', help='Keep archival copy of source document under given path')
+    args = parser.parse_args()
+
+    print(format_week(fetch(args.location, args.archive)))
