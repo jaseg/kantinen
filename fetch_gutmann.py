@@ -42,7 +42,7 @@ def fetch(location='MA', archive=None):
             s = re.sub(pat, repl, s)
         return s
 
-    e = [[ subs(v).strip() for v in vs if not 'Jodsalz' in v and v.strip()] for vs in [e.split('€') for e in l]]
+    e = [[ subs(v).strip() for v in vs if not 'Jodsalz' in v and not 'Änderungen' in v and v.strip()] for vs in [e.split('€') for e in l]]
     f = [[(' '.join(title), Decimal(price.replace(',', '.'))) for *title, price in [el.split() for el in k]] for k in e]
     return f
 
